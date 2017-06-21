@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import dehaze
 
-pic=cv2.imread(filename="6.png",flags=cv2.IMREAD_COLOR)
+pic=cv2.imread(filename="1.jpg",flags=cv2.IMREAD_COLOR)
 cv2.imshow(winname="original",mat=pic)
 minMap=dehaze.getMinMap(pic)
 cv2.imshow(winname="minMap",mat=minMap)
