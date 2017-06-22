@@ -6,11 +6,12 @@ import dehaze
 
 #dict to get pixel light info of dark map
 result=np.zeros(shape=(256,))
+accum=np.zeros(shape=(256,))
 lights=[]
 num=1
-for num in range(1,1159):
+for num in range(1,177):
     print("processing the",num,"'th image")
-    filename="../data/img256x256/pic"+str(num)+".jpg"
+    filename="../data/H256x256/H"+str(num)+".jpg"
     pic=cv2.imread(filename=filename,flags=cv2.IMREAD_COLOR)
     #cv2.imshow(winname="original",mat=pic)
     minMap=dehaze.getMinMap(pic)
@@ -27,10 +28,17 @@ for num in range(1,1159):
             lights.append(darkMap[i][j])
             result[minMap[i][j]]+=1
 
+'''
+total=result.sum()
+for l in range(256):
+    accum[l]=result[:l+1].sum()/total
+
+plt.plot(range(256),accum)
+'''
 
 plt.hist(lights,bins=256,normed=True)
-plt.xlabel("intensity")
-plt.ylabel("probability")
+plt.xlabel("Intensity")
+plt.ylabel("Probability")
 plt.show()
 cv2.waitKey(0)
 cv2.destroyAllWindows()
