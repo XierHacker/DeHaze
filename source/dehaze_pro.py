@@ -23,7 +23,26 @@ def getDarkMap(img,pitchSize=9):
 
     return pad,darkMap
 
-def getAtmosphericLight(darkMap,percent=0.001):
+def getAtmosphericLight(img,darkMap,percent=0.001,kind=1):
+    if kind == 1:
+        #qulity param of water
+        c=2.190
+        '''
+        VolumeScatterList=[
+            2.936,2.936,2.936,2.936,2.936,2.936,2.936,2.936,2.936,2.936,2.936,
+            2.935,2.935,2.935,2.933,2.932,2.930,2.926,2.920,2.936,2.936,2.936]
+        '''
+
+        return (1.06*8.41*200/c)
+
+    if kind == 2:
+        return None
+    if kind == 3:
+        return None
+    if kind == 4:
+        return None
+
+    '''
     amout=int(darkMap.shape[0]*darkMap.shape[1]*percent)
     darkMap_flat=darkMap.flatten()
     #sort
@@ -36,6 +55,10 @@ def getAtmosphericLight(darkMap,percent=0.001):
     else:
         A=int(darkMap_flat[0:amout].mean())
     return A
+    '''
+
+
+
 
 def getTransmissionMap(darkMap,atmosphericLight,omega=0.95):
     transmission=1-(omega*darkMap)/atmosphericLight
