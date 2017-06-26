@@ -1,6 +1,7 @@
-import cv2;
-import math;
-import numpy as np;
+import cv2
+import math
+import numpy as np
+import metrics
 
 def DarkChannel(im,sz):
     b,g,r = cv2.split(im)
@@ -9,7 +10,7 @@ def DarkChannel(im,sz):
     dark = cv2.erode(dc,kernel)
     return dark
 
-def AtmLight(im,dark,kind=0):
+def AtmLight(im,dark,kind=1):
     [h,w] = im.shape[:2]
     imsz = h*w
     numpx = int(max(math.floor(imsz/100),1))
@@ -25,7 +26,20 @@ def AtmLight(im,dark,kind=0):
        atmsum = atmsum + imvec[indices[ind]]
 
     A = (atmsum / numpx)
-    return A* 1.06 * 8.41 / 2.19
+
+    #pure water
+    if kind==0:
+        return A* 1.06 * 1.6 / 0.043
+    #clean water
+    if kind==1:
+        return A* 1.06 * 2.46 / 0.151
+    #castal
+    if kind==2:
+        return A* 1.06 * 5.24 / 0.398
+    #
+    if kind==3:
+        return A* 1.06 * 8.41 / 2.19
+
 
 def TransmissionEstimate(im,A,sz):
     omega = 0.95;
@@ -70,5 +84,14 @@ def Recover(im,t,A,tx = 0.1):
 
     for ind in range(0,3):
         res[:,:,ind] = (im[:,:,ind]-A[0,ind])/t + A[0,ind]
+
+    #adjust
+    for i in range(res.shape[0]):
+        for j in range(res.shape[1]):
+            for k in range(res.shape[2]):
+                if res[i,j,k]<0:
+                    res[i,j,k]=0
+                if res[i,j,k]>1:
+                    res[i,j,k]=1
 
     return res
