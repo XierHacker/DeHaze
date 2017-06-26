@@ -1,7 +1,10 @@
-import cv2;
-import math;
-import numpy as np;
+import cv2
+import math
+import numpy as np
 
+
+#---------------img statistics-----------------#
+#get most frequently light
 def getMostFrequent(img):
     A=np.zeros(shape=[1,3])
     g_array=np.zeros(shape=(256,))
@@ -22,19 +25,42 @@ def getMostFrequent(img):
     A[0,1]=b_intensity
     A[0,2]=r_intensity
 
-    return A*1.06*8.41/2.19
+    return A/255
 
+def getMostBright(img):
+    A = np.zeros(shape=(1, 3))
+    height = img.shape[0]
+    width = img.shape[1]
+    total_pixel = height * width
+    # print(total_pixel)
+    numpx = int(max(math.floor(total_pixel / 1000), 1))
+    # print(numpx)
 
+    g_img = img[:, :, 0]
+    b_img = img[:, :, 1]
+    r_img = img[:, :, 2]
 
-def DarkChannel(im, sz):
-    b, g, r = cv2.split(im)
-    dc = cv2.min(cv2.min(r, g), b);
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (sz, sz))
-    dark = cv2.erode(dc, kernel)
-    return dark
+    g_img_vector = g_img.flatten()
+    g_img_vector.sort()
+    g_img_max = g_img_vector[-numpx:]
+    g_average = g_img_max.mean()
 
+    b_img_vector = b_img.flatten()
+    b_img_vector.sort()
+    b_img_max = b_img_vector[-numpx:]
+    b_average = b_img_max.mean()
 
-def AtmLight(im, dark):
+    r_img_vector = r_img.flatten()
+    r_img_vector.sort()
+    r_img_max = r_img_vector[-numpx:]
+    r_average = r_img_max.mean()
+
+    A[0, 0] = g_average
+    A[0, 1] = b_average
+    A[0, 2] = r_average
+    return A
+
+def getMostBrightByDarkMap(im,dark):
     [h, w] = im.shape[:2]
     imsz = h * w
     numpx = int(max(math.floor(imsz / 1000), 1))
@@ -49,8 +75,27 @@ def AtmLight(im, dark):
     for ind in range(1, numpx):
         atmsum = atmsum + imvec[indices[ind]]
 
-    A = ((atmsum / numpx)*1.06*8.41)/2.19
+    A = (atmsum / numpx)
     return A
+
+#-----------------------------------------------------#
+
+
+def DarkChannel(im, sz):
+    b, g, r = cv2.split(im)
+    dc = cv2.min(cv2.min(r, g), b);
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (sz, sz))
+    dark = cv2.erode(dc, kernel)
+    return dark
+
+
+def AtmLight(im, dark,kind=0):
+    A1=getMostBrightByDarkMap(im,dark)
+    A2=getMostBright(im)
+
+    A1=A1*1.06*8.41/2.19
+    A2 = A2 * 1.06 * 8.41 / 2.19
+    return A1,A2
 
 
 def TransmissionEstimate(im, A, sz):
@@ -101,49 +146,3 @@ def Recover(im, t, A, tx=0.1):
         res[:, :, ind] = (im[:, :, ind] - A[0, ind]) / t + A[0, ind]
 
     return res
-
-
-if __name__ == '__main__':
-    import sys
-
-    try:
-        fn = sys.argv[1]
-    except:
-        fn = './image/H170.jpg'
-
-
-    def nothing(*argv):
-        pass
-
-
-    src = cv2.imread(fn);
-    #compute the fraquent t
-    A1=getMostFrequent(src)/255
-    print("A1:",A1)
-
-
-    print("src:",src)
-    I = src.astype('float64') / 255;
-    te1=TransmissionEstimate(I,A1,15)
-    t1=TransmissionRefine(src,te1)
-
-    cv2.imshow("te1", te1)
-    cv2.imshow("t1", t1);
-
-    dark = DarkChannel(I, 15);
-    print(dark.dtype)
-    print(dark.shape)
-    A2 = AtmLight(I, dark);
-    print("A2:",A2)
-    te2 = TransmissionEstimate(I, A2, 15);
-    t2 = TransmissionRefine(src, te2);
-    t=(t1+t2)/2
-    J = Recover(I, t, A2, 0.1);
-
-    cv2.imshow("dark", dark);
-    cv2.imshow("te2", te2)
-    cv2.imshow("t2", t2);
-    cv2.imshow('I', src);
-    cv2.imshow('J', J);
-    # cv2.imwrite("./image/J.png",J*255);
-    cv2.waitKey();

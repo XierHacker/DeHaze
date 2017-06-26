@@ -9,7 +9,7 @@ def DarkChannel(im,sz):
     dark = cv2.erode(dc,kernel)
     return dark
 
-def AtmLight(im,dark):
+def AtmLight(im,dark,kind=0):
     [h,w] = im.shape[:2]
     imsz = h*w
     numpx = int(max(math.floor(imsz/1000),1))
@@ -25,7 +25,7 @@ def AtmLight(im,dark):
        atmsum = atmsum + imvec[indices[ind]]
 
     A = (atmsum / numpx)
-    return A
+    return A* 1.06 * 8.41 / 2.19
 
 def TransmissionEstimate(im,A,sz):
     omega = 0.95;

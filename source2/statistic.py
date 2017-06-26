@@ -3,6 +3,7 @@ import cv2
 import os
 import matplotlib.pyplot as plt
 import dehaze
+import math
 
 def drawProb(folderPath):
     file_list=os.listdir(folderPath)
@@ -16,16 +17,15 @@ def drawProb(folderPath):
         print("processing the",num+1,"'th image")
         filename=folderPath+file_list[num]
         pic=cv2.imread(filename=filename,flags=cv2.IMREAD_COLOR)
-        #cv2.imshow(winname="original",mat=pic)
-        minMap=dehaze.getMinMap(pic)
+
         #cv2.imshow(winname="minMap",mat=minMap)
-        pad,darkMap=dehaze.getDarkMap(minMap)
+        darkMap=dehaze.DarkChannel(pic,15)
 
 
         for i in range(darkMap.shape[0]):
             for j in range(darkMap.shape[1]):
                 lights.append(darkMap[i][j])
-                result[minMap[i][j]]+=1
+                result[darkMap[i][j]]+=1
 
     plt.hist(lights, bins=256, normed=True)
     plt.xlabel("Intensity")
@@ -33,9 +33,5 @@ def drawProb(folderPath):
     plt.show()
 
 
-#statist a sigle image imformation
-def statImg(filename):
-    pic = cv2.imread(filename=filename, flags=cv2.IMREAD_COLOR)
-    pass
 
 #drawProb(folderPath="../data/H256x256/")
