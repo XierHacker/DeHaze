@@ -12,7 +12,7 @@ def DarkChannel(im,sz):
 def AtmLight(im,dark,kind=0):
     [h,w] = im.shape[:2]
     imsz = h*w
-    numpx = int(max(math.floor(imsz/1000),1))
+    numpx = int(max(math.floor(imsz/100),1))
     darkvec = dark.reshape(imsz,1);
     imvec = im.reshape(imsz,3);
 

@@ -1,13 +1,17 @@
 import numpy as np
 import cv2
 import dehaze3
+import metrics
 
 #load img and show original image
-pic=cv2.imread(filename="../data/H256x256/H11.jpg",flags=cv2.IMREAD_COLOR)
+pic=cv2.imread(filename="../data/H256x256/H3.jpg",flags=cv2.IMREAD_COLOR)
 cv2.imshow(winname="original",mat=pic)
+
 
 #trans to float
 I = pic.astype('float64')/255
+print("contrast of pic:",metrics.contrast(I[:,:,1]))
+print("entropy of pic:",metrics.entropy(I[:,:,1]))
 
 #get darkMap
 darkMap=dehaze3.DarkChannel(I,15)
@@ -35,6 +39,9 @@ print("shape of transMap_refine:",transMap_refine.shape)
 recover=dehaze3.Recover(I,transMap_refine,A,0.1)
 #print (recover)
 cv2.imshow("recover",recover)
+
+print("contrast of recover:",metrics.contrast(recover[:,:,1]))
+print("entropy of recover:",metrics.entropy(recover[:,:,1]))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
