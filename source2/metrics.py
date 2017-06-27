@@ -46,7 +46,7 @@ def get_all_metrics(img):
     aveGradient_r = aveGradient(img_r)
     aveGradient_ave = (aveGradient_g+aveGradient_b+aveGradient_r)/3
 
-    return contrast_ave,entropy_ave,aveGradient_ave
+    return [contrast_ave,entropy_ave,aveGradient_ave]
 
 def SNR(img):
     pass

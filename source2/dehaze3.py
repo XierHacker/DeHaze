@@ -18,7 +18,7 @@ def AtmLight(im,dark,kind=1):
     imvec = im.reshape(imsz,3);
 
     indices = darkvec.argsort();
-    print(indices.shape)
+    #print(indices.shape)
     indices = indices[imsz-numpx:,0]
 
     atmsum = np.zeros([1,3])
@@ -95,3 +95,63 @@ def Recover(im,t,A,tx = 0.1):
                     res[i,j,k]=1
 
     return res
+
+def get_recover(img,size):
+    # trans to float
+    I = img.astype('float64') / 255
+
+    # get darkMap
+    darkMap = DarkChannel(I, size)
+
+    # atmosphere light
+    A = AtmLight(I, darkMap)
+
+    # transMap
+    transMap_estimate = TransmissionEstimate(I, A, size)
+
+    # transMap_refine
+    transMap_refine = TransmissionRefine(img, transMap_estimate)
+
+    # recover
+    recover = Recover(I, transMap_refine, A, 0.1)
+
+
+    #testing code
+    cv2.imshow("original",img)
+    #print ("darkMap:",darkMap)
+    cv2.imshow(winname="darkmap", mat=darkMap)
+    #print ("darkMap.shape:",darkMap.shape)
+    
+    #print ("A:",A)
+    #print(A.shape)
+    
+    cv2.imshow("TransMap_estimate:", transMap_estimate)
+    #print("shape of transMap_estimate:",transMap_estimate.shape)
+    
+    cv2.imshow("TransMap_refine:", transMap_refine)
+    #print("shape of transMap_refine:",transMap_refine.shape)
+    
+    #print ("recover:",recover)
+    cv2.imshow("recover", recover)
+
+    recover2 = (recover * 255).astype(np.uint8)
+    #print(recover2)
+    cv2.imshow("recover2", recover2)
+
+    recover3=np.zeros(shape=(img.shape[0],img.shape[1],3))
+    #recover3[:,:,0]=cv2.equalizeHist(recover2[:,:,0])
+    recover3[:, :, 0] = recover2[:, :, 0]
+    recover3[:, :, 2] = recover2[:, :, 2]
+    recover3[:, :, 1] = cv2.equalizeHist(recover2[:, :, 1])
+   # recover3[:, :, 2] = cv2.equalizeHist(recover2[:, :, 2])
+    recover3=recover3.astype(np.float64)/255
+    #print(recover3)
+    cv2.imshow("recover3",recover3)
+    print(metrics.get_all_metrics(I))
+    print(metrics.get_all_metrics(recover))
+    print(metrics.get_all_metrics(recover3))
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    #return recover

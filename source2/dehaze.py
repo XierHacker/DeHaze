@@ -17,7 +17,7 @@ def AtmLight(im,dark):
     imvec = im.reshape(imsz,3);
 
     indices = darkvec.argsort();
-    print(indices.shape)
+    #print(indices.shape)
     indices = indices[imsz-numpx:,0]
 
     atmsum = np.zeros([1,3])
@@ -71,4 +71,53 @@ def Recover(im,t,A,tx = 0.1):
     for ind in range(0,3):
         res[:,:,ind] = (im[:,:,ind]-A[0,ind])/t + A[0,ind]
 
+    # adjust
+    for i in range(res.shape[0]):
+        for j in range(res.shape[1]):
+            for k in range(res.shape[2]):
+                if res[i, j, k] < 0:
+                    res[i, j, k] = 0
+                if res[i, j, k] > 1:
+                    res[i, j, k] = 1
+
     return res
+
+def get_recover(img,size):
+    # trans to float
+    I = img.astype('float64') / 255
+
+    # get darkMap
+    darkMap = DarkChannel(I, size)
+    # print ("darkMap:",darkMap)
+    #cv2.imshow(winname="darkmap", mat=darkMap)
+    # print ("darkMap.shape:",darkMap.shape)
+
+    # atmosphere light
+    A = AtmLight(I, darkMap)
+    # print ("A:",A)
+    # print(A.shape)
+
+    # transMap
+    transMap_estimate = TransmissionEstimate(I, A, size)
+    #cv2.imshow("TransMap_estimate:", transMap_estimate)
+    # print("shape of transMap_estimate:",transMap_estimate.shape)
+
+    # transMap_refine
+    transMap_refine = TransmissionRefine(img, transMap_estimate)
+    #cv2.imshow("TransMap_refine:", transMap_refine)
+    # print("shape of transMap_refine:",transMap_refine.shape)
+
+    # recover
+    recover = Recover(I, transMap_refine, A, 0.1)
+    # print ("recover:",recover)
+    #cv2.imshow("recover", recover)
+
+    #recover2 = (recover * 255).astype(np.uint8)
+    # print(recover2)
+    #cv2.imshow("recover2", recover2)
+
+    #print(metrics.get_all_metrics(I))
+    #print(metrics.get_all_metrics(recover))
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+    return recover

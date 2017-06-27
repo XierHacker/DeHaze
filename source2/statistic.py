@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import os
 import matplotlib.pyplot as plt
-import dehaze
+import dehaze3
 import math
 
 def drawProb(folderPath):
@@ -19,7 +19,7 @@ def drawProb(folderPath):
         pic=cv2.imread(filename=filename,flags=cv2.IMREAD_COLOR)
 
         #cv2.imshow(winname="minMap",mat=minMap)
-        darkMap=dehaze.DarkChannel(pic,15)
+        darkMap=dehaze3.DarkChannel(pic,15)
 
 
         for i in range(darkMap.shape[0]):
