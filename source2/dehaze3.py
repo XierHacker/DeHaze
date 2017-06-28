@@ -10,7 +10,7 @@ def DarkChannel(im,sz):
     dark = cv2.erode(dc,kernel)
     return dark
 
-def AtmLight(im,dark,kind=1):
+def AtmLight(im,dark,kind=0):
     [h,w] = im.shape[:2]
     imsz = h*w
     numpx = int(max(math.floor(imsz/100),1))
@@ -93,8 +93,17 @@ def Recover(im,t,A,tx = 0.1):
                     res[i,j,k]=0
                 if res[i,j,k]>1:
                     res[i,j,k]=1
-
     return res
+
+def recoverEnhancement(img,darkMap,recover):
+    temp=recover.copy()
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            #dark map judge haze location
+            if darkMap[i][j]<0.08:
+                temp[i,j,:]+=(img[i,j,:]-temp[i,j,:])*0.5
+    return temp
+
 
 def get_recover(img,size):
     # trans to float
@@ -102,6 +111,7 @@ def get_recover(img,size):
 
     # get darkMap
     darkMap = DarkChannel(I, size)
+    print(darkMap)
 
     # atmosphere light
     A = AtmLight(I, darkMap)
@@ -139,17 +149,17 @@ def get_recover(img,size):
     cv2.imshow("recover2", recover2)
 
     recover3=np.zeros(shape=(img.shape[0],img.shape[1],3))
-    #recover3[:,:,0]=cv2.equalizeHist(recover2[:,:,0])
-    recover3[:, :, 0] = recover2[:, :, 0]
-    recover3[:, :, 2] = recover2[:, :, 2]
-    recover3[:, :, 1] = cv2.equalizeHist(recover2[:, :, 1])
-   # recover3[:, :, 2] = cv2.equalizeHist(recover2[:, :, 2])
-    recover3=recover3.astype(np.float64)/255
-    #print(recover3)
+    recover3=1.5*recover+0.1
+
+
     cv2.imshow("recover3",recover3)
+
+    recover4=recoverEnhancement(I,darkMap,recover)
+    cv2.imshow("recover4", recover4)
     print(metrics.get_all_metrics(I))
     print(metrics.get_all_metrics(recover))
     print(metrics.get_all_metrics(recover3))
+    print(metrics.get_all_metrics(recover4))
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()

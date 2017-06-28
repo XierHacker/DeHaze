@@ -38,4 +38,4 @@ def statImg(filename):
     pic = cv2.imread(filename=filename, flags=cv2.IMREAD_COLOR)
     pass
 
-#drawProb(folderPath="../data/H256x256/")
+drawProb(folderPath="../data/C256x256/")
