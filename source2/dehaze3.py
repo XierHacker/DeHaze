@@ -10,7 +10,7 @@ def DarkChannel(im,sz):
     dark = cv2.erode(dc,kernel)
     return dark
 
-def AtmLight(im,dark,kind=0):
+def AtmLight(im,dark,kind):
     [h,w] = im.shape[:2]
     imsz = h*w
     numpx = int(max(math.floor(imsz/100),1))
@@ -42,13 +42,13 @@ def AtmLight(im,dark,kind=0):
 
 
 def TransmissionEstimate(im,A,sz):
-    omega = 0.95;
+    #omega = 0.95;
     im3 = np.empty(im.shape,im.dtype);
 
     for ind in range(0,3):
         im3[:,:,ind] = im[:,:,ind]/A[0,ind]
 
-    transmission = 1 - omega*DarkChannel(im3,sz);
+    transmission = 1 - DarkChannel(im3,sz);
     return transmission
 
 def Guidedfilter(im,p,r,eps):
@@ -95,17 +95,29 @@ def Recover(im,t,A,tx = 0.1):
                     res[i,j,k]=1
     return res
 
-def recoverEnhancement(img,darkMap,recover):
+def recoverEnhancement(recover,kind):
     temp=recover.copy()
-    for i in range(img.shape[0]):
-        for j in range(img.shape[1]):
-            #dark map judge haze location
-            if darkMap[i][j]<0.08:
-                temp[i,j,:]+=(img[i,j,:]-temp[i,j,:])*0.5
+    if kind==0:
+        temp= 1.4 * recover - 0.1
+    if kind==1:
+        temp = 1.5 * recover - 0.1
+    if kind==2:
+        temp = 2 * recover-0.1
+    if kind==3:
+        temp = 1.5 * recover
+
+    for i in range(temp.shape[0]):
+        for j in range(temp.shape[1]):
+            for k in range(temp.shape[2]):
+                if temp[i,j,k]<0:
+                    temp[i,j,k]=0
+                if temp[i,j,k]>1:
+                    temp[i,j,k]=1
     return temp
 
 
-def get_recover(img,size):
+
+def get_recover(img,size,kind):
     # trans to float
     I = img.astype('float64') / 255
 
@@ -114,7 +126,7 @@ def get_recover(img,size):
     print(darkMap)
 
     # atmosphere light
-    A = AtmLight(I, darkMap)
+    A = AtmLight(I, darkMap,kind)
 
     # transMap
     transMap_estimate = TransmissionEstimate(I, A, size)
@@ -144,22 +156,18 @@ def get_recover(img,size):
     #print ("recover:",recover)
     cv2.imshow("recover", recover)
 
-    recover2 = (recover * 255).astype(np.uint8)
+    #recover2 = (recover * 255).astype(np.uint8)
     #print(recover2)
-    cv2.imshow("recover2", recover2)
+    #cv2.imshow("recover2", recover2)
 
-    recover3=np.zeros(shape=(img.shape[0],img.shape[1],3))
-    recover3=1.5*recover+0.1
-
+    recover3=recoverEnhancement(recover,kind)
 
     cv2.imshow("recover3",recover3)
 
-    recover4=recoverEnhancement(I,darkMap,recover)
-    cv2.imshow("recover4", recover4)
     print(metrics.get_all_metrics(I))
     print(metrics.get_all_metrics(recover))
     print(metrics.get_all_metrics(recover3))
-    print(metrics.get_all_metrics(recover4))
+
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
