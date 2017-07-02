@@ -34,4 +34,4 @@ def drawProb(folderPath):
 
 
 
-#drawProb(folderPath="../data/H256x256/")
+drawProb(folderPath="../data/H256x256/")

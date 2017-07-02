@@ -18,8 +18,8 @@ def eval(folderPath):
         print("processing ",index+1,"\'th image")
         filename=folderPath+file
         img = cv2.imread(filename)
-        recover_dehaze=dehaze.get_recover(img,15)
-        recover_dehaze3=dehaze3.get_recover(img,15)
+        recover_dehaze=dehaze.get_recover(img,9)
+        recover_dehaze3=dehaze3.get_recover(img,9,kind=1)
         #result is a 3 element list
         metrics_img=metrics.get_all_metrics(img/255)
         metrics_dehaze=metrics.get_all_metrics(recover_dehaze)
@@ -64,7 +64,7 @@ def draw(result_img,result_dehaze,result_dehaze3):
     plt.show()
 
 
-result_img,result_dehaze,result_dehaze3=eval(folderPath="../data/H256x256/")
+result_img,result_dehaze,result_dehaze3=eval(folderPath="../data/QH256x256/")
 print("result_img:")
 print(result_img.shape)
 print(result_img)

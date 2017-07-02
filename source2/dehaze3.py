@@ -102,7 +102,7 @@ def recoverEnhancement(recover,kind):
     if kind==1:
         temp = 1.5 * recover - 0.1
     if kind==2:
-        temp = 2 * recover-0.1
+        temp = 1.4 * recover-0.1
     if kind==3:
         temp = 1.5 * recover
 
@@ -123,7 +123,7 @@ def get_recover(img,size,kind):
 
     # get darkMap
     darkMap = DarkChannel(I, size)
-    print(darkMap)
+    #print(darkMap)
 
     # atmosphere light
     A = AtmLight(I, darkMap,kind)
@@ -139,22 +139,22 @@ def get_recover(img,size,kind):
 
 
     #testing code
-    cv2.imshow("original",img)
+    #cv2.imshow("original",img)
     #print ("darkMap:",darkMap)
-    cv2.imshow(winname="darkmap", mat=darkMap)
+    #cv2.imshow(winname="darkmap", mat=darkMap)
     #print ("darkMap.shape:",darkMap.shape)
     
     #print ("A:",A)
     #print(A.shape)
     
-    cv2.imshow("TransMap_estimate:", transMap_estimate)
+    #cv2.imshow("TransMap_estimate:", transMap_estimate)
     #print("shape of transMap_estimate:",transMap_estimate.shape)
     
-    cv2.imshow("TransMap_refine:", transMap_refine)
+    #cv2.imshow("TransMap_refine:", transMap_refine)
     #print("shape of transMap_refine:",transMap_refine.shape)
     
     #print ("recover:",recover)
-    cv2.imshow("recover", recover)
+    #cv2.imshow("recover", recover)
 
     #recover2 = (recover * 255).astype(np.uint8)
     #print(recover2)
@@ -162,14 +162,14 @@ def get_recover(img,size,kind):
 
     recover3=recoverEnhancement(recover,kind)
 
-    cv2.imshow("recover3",recover3)
+    #cv2.imshow("recover3",recover3)
 
-    print(metrics.get_all_metrics(I))
-    print(metrics.get_all_metrics(recover))
-    print(metrics.get_all_metrics(recover3))
+    #print(metrics.get_all_metrics(I))
+    #print(metrics.get_all_metrics(recover))
+    #print(metrics.get_all_metrics(recover3))
 
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
-    #return recover
+    return recover3

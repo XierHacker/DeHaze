@@ -4,7 +4,7 @@ import dehaze3
 import metrics
 
 #load img and show original image
-pic=cv2.imread(filename="../data/H256x256/H12.jpg",flags=cv2.IMREAD_COLOR)
+pic=cv2.imread(filename="../data/QH256x256/QH115.jpg",flags=cv2.IMREAD_COLOR)
 cv2.imshow(winname="original",mat=pic)
 
 
@@ -18,7 +18,7 @@ cv2.imshow(winname="darkmap",mat=darkMap)
 #print ("darkMap.shape:",darkMap.shape)
 
 #atmosphere light
-A=dehaze3.AtmLight(I,darkMap)
+A=dehaze3.AtmLight(I,darkMap,kind=2)
 #print ("A:",A)
 #print(A.shape)
 
@@ -43,7 +43,10 @@ recover2=(recover*255).astype(np.uint8)
 #print(recover2)
 cv2.imshow("recover2",recover2)
 
+recover3=dehaze3.recoverEnhancement(recover,kind=2)
+cv2.imshow("recover3",recover3)
 print(metrics.get_all_metrics(I))
 print(metrics.get_all_metrics(recover))
+print(metrics.get_all_metrics(recover3))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
