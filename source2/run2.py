@@ -3,7 +3,7 @@ import cv2
 import dehaze2
 
 #load img and show original image
-pic=cv2.imread(filename="../data/H256x256/H11.jpg",flags=cv2.IMREAD_COLOR)
+pic=cv2.imread(filename="../data/H256x256/H18.jpg",flags=cv2.IMREAD_COLOR)
 cv2.imshow(winname="original",mat=pic)
 
 #trans to float

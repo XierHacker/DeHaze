@@ -1,10 +1,24 @@
-import cv2
 import numpy as np
-import dehaze3
+import cv2
+import tensorflow as tf
 
-img=cv2.imread("../data/QH256x256/QH1.jpg")
-dehaze3.get_recover(img=img,size=9,kind=2)
-#img2=cv2.equalizeHist(src=img[:,:,2])
-#cv2.imshow("img2",img2)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
+pic=cv2.imread(filename="../data/H256x256/H1.jpg",flags=cv2.IMREAD_COLOR)
+print(pic.shape)
+dataSet=np.zeros(shape=(2,256,256,3))
+dataSet[0]=pic/255
+print(dataSet[0])
+
+resized=tf.image.resize_image_with_crop_or_pad(image=dataSet[0],target_height=244,target_width=244)
+
+print(resized)
+
+with tf.Session() as sess:
+    pic_resized=sess.run(resized)
+
+
+cv2.imshow(winname="pic",mat=pic/255)
+cv2.imshow(winname="dataSet",mat=dataSet[0])
+cv2.imshow(winname="resized",mat=pic_resized)
+cv2.waitKey()
+cv2.destroyAllWindows()
+
