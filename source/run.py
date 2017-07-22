@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import dehaze
 
-pic=cv2.imread(filename="../data/H256x256/H176.jpg",flags=cv2.IMREAD_COLOR)
+pic=cv2.imread(filename="../data/H12.jpg",flags=cv2.IMREAD_COLOR)
 cv2.imshow(winname="original",mat=pic)
 minMap=dehaze.getMinMap(pic)
 cv2.imshow(winname="minMap",mat=minMap)

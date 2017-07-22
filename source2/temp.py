@@ -1,4 +1,17 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
+x=np.linspace(start=-1,stop=1,num=100)
+y=np.log(1-x)
+
+plt.plot(x,y)
+plt.show()
+
+
+
+
+'''
+import numpy as np
 import cv2
 import tensorflow as tf
 
@@ -21,4 +34,5 @@ cv2.imshow(winname="dataSet",mat=dataSet[0])
 cv2.imshow(winname="resized",mat=pic_resized)
 cv2.waitKey()
 cv2.destroyAllWindows()
+'''
 
