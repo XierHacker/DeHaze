@@ -63,8 +63,29 @@ def draw(result_img,result_dehaze,result_dehaze3):
 
     plt.show()
 
+def get_sheet(result_img,result_dehaze,result_dehaze3):
+    num=result_img.shape[0]
+    contrast_ave = np.zeros(shape=(3,))
+    entropy_ave = np.zeros(shape=(3,))
+    aveGradient_ave = np.zeros(shape=(3,))
 
-result_img,result_dehaze,result_dehaze3=eval(folderPath="../data/QH256x256/")
+    contrast_best=np.zeros(shape=(3,))
+    entropy_best = np.zeros(shape=(3,))
+    aveGradient_best = np.zeros(shape=(3,))
+    for i in range(num):
+        contrast_ave=np.array([result_img[i,0],result_dehaze[i,0],result_dehaze3[i,0]])
+        entropy_ave=np.array([result_img[i,1],result_dehaze[i,1],result_dehaze3[i,1]])
+        aveGradient_ave=np.array([result_img[i,2],result_dehaze[i,2],result_dehaze3[i,2]])
+
+        contrast_best[np.argmax(contrast_ave)]+=1
+        entropy_best[np.argmax(entropy_ave)]+=1
+        aveGradient_best[np.argmax(aveGradient_ave)]+=1
+
+    return contrast_best,entropy_best,aveGradient_best
+
+
+
+result_img,result_dehaze,result_dehaze3=eval(folderPath="../data/QingJie256x256/")
 print("result_img:")
 print(result_img.shape)
 print(result_img)
@@ -76,5 +97,10 @@ print()
 print("result_dehaze3")
 print(result_dehaze3.shape)
 print(result_dehaze3)
+
+contrast_best,entropy_best,aveGradient_best=get_sheet(result_img,result_dehaze,result_dehaze3)
+print(contrast_best)
+print(entropy_best)
+print(aveGradient_best)
 
 draw(result_img,result_dehaze,result_dehaze3)

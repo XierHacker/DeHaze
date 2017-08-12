@@ -14,10 +14,5 @@ x,labels=pic_to_csv.getDataSet()
 print(x.shape)
 print(labels.shape)
 
-x=tf.image.resize_image_with_crop_or_pad(image=x,target_width=224,target_height=224)
-
-with tf.Session() as sess:
-    train=sess.run(x)
-
 model=AlexNet()
-model.fit(train,labels,epochs=10,batch_size=5)
+model.fit(x,labels,epochs=10,batch_size=5)
